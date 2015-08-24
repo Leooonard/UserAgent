@@ -1,0 +1,53 @@
+{
+	"L1": {
+		"Android|android[ /]?\\d+\\.\\d+" : "Android",
+		"(iPod|iPhone|iPad)" : "Mobile Safari",
+		"(MSIE) (\\d+)\\.(\\d+)" : "IE",
+		"Trident(.*)rv.(\\d+)\\.(\\d+)" : "IE",
+		"(IEMobile)[ /](\\d+)\\.(\\d+)" : "IE Mobile",
+		"(Chromium|Chrome)/(\\d+)\\.(\\d+)" : "Chrome",
+		"(Firefox)/(\\d+)\\.(\\d+)" : "Firefox",
+		"Opera[/ ](\\d+)\\.(\\d+)" : "Opera",
+		"OPR/(\\d+)\\.(\\d+)" : "Opera",
+		"Opera Mini/(\\d+)\\.(\\d+)" : "Opera Mini",
+		"(Version)/(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*Safari/" : "Safari"
+	},
+	"L2": {
+		"Android": {
+			"MiuiBrowser/(\\d+)\\.(\\d+)\\.(\\d+)" : "xiaomi",
+			"360" : "360 Browser Mobile",
+			"UCBrowser|UCWEB" : "UC Browser",
+			"MQQBrowser" : "QQ Browser Mobile",
+			"LieBao" : "LieBao Browser",
+			"(Chrome)/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+) Mobile" : "Chrome Mobile"
+		},
+		"Mobile Safari": {
+			"UCBrowser|UCWEB" : "UC Browser",
+			"MQQBrowser" : "QQ Browser Mobile",
+			"(CriOS)/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)" : "Chrome Mobile IOS"
+		},
+		"IE": {
+			"360SE" : "360 Browser",
+			"QIHU" : "The World",
+			"MetaSr" : "Sogou Explorer",
+			"Maxthon" : "Maxthon",
+			"2345Explorer" : "2345 Browser",
+			"2345chrome" : "2345 Browser",
+			"QQBrowser" : "QQ Browser",
+			"TencentTraveler" : "Tencent Browser"
+		},
+		"IE Mobile": {
+			"UCBrowser|UCWEB" : "UC Browser",
+			"MQQBrowser" : "QQ Browser Mobile"
+		},
+		"Chrome": {
+			"MetaSr" : "Sogou Explorer",
+			"2345Explorer" : "2345 Browser",
+			"2345Chrome" : "2345 Browser",
+			"LBBrowser" : "LieBao Browser",
+			"BIDUBrowser" : "Baidu Explorer",
+			"QQBrowser" : "QQ Browser",
+			"Maxthon" : "Maxthon"
+		}
+	}
+}
