@@ -2,12 +2,12 @@
 
 let ut = require('util')
 ,	fs = require("fs")
-,	clean = require('./clean/clean.js')
-,	compare = require("./compare.js")
-,	show = require("./show.js")
-,	execFromFile = require("./exec/exec.js").execFromFile
-,	exec = require("./exec/exec.js").exec
-,	md = require("./md.js")
+,	clean = require('./src/clean/clean.js')
+,	compare = require("./src/compare.js")
+,	show = require("./src/show.js")
+,	execFromFile = require("./src/exec/exec.js").execFromFile
+,	exec = require("./src/exec/exec.js").exec
+,	md = require("./src/md.js")
 
 const HELP_COMMAND = "help"
 const CLEAN_COMMAND = "clean"
@@ -129,6 +129,7 @@ command:\n\
 		,	totalCount = result.totalCount || 0
 		,	fitRate = result.fitRate || 0
 		,	unfitTable = result.unfitTable || {}
+		,	mdDoc = new md
 
 		,	splited = resultFilePath ? resultFilePath.split(".") : []
 		,	suffix = splited.length > 0 ? splited[splited.length - 1] : ''
