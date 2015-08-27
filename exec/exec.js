@@ -1,121 +1,229 @@
 'use strict'
 
 let linebylineReader = require("line-by-line")
-,	fs =require("fs")
+,	show = require("../show.js")
+,	fs = require("fs")
+,	path = require("path")
 ,	uaList = require("./ua.json")
-,	uaMap = new Map
-,	l1Map = new Map
-,	l2Map = new Map
+,	cache = require("./cache.js")
+,	UA = require("./ua.js")
+,	logFd
+,	resultFd
+,	cacheFlag
 
 //将json转换为map.
 Object.keys(uaList.L1).forEach((val, idx, array) => {
-	l1Map.set(new RegExp(val), uaList.L1[val])
+	uaList.L1[val] = new RegExp(uaList.L1[val], "i")
 })
 Object.keys(uaList.L2).forEach((val, idx, array) => {
-	let map = new Map
 	Object.keys(uaList.L2[val]).forEach((v, i, arr) => {
-		map.set(new RegExp(val), uaList.L2[val][v])
+		uaList.L2[val][v] = new RegExp(uaList.L2[val][v], "i")
 	})
-	l2Map.set(val, map)
 })
-uaMap.set("L1", l1Map)
-uaMap.set("L2", l2Map)
 
-let ua = function(family, main, minor, patch){
-	this.family = family
-	this.main = main
-	this.minor = minor
-	this.patch = patch
-}
+let HitTable = function(){
+	let hitMap = {}
 
-let uaCount = 0
-,	totalCount = 0
-,	hitCount = 0
-,	maxCount = 0
-,	minCount = Infinity
-
-let test = function(ua){
-	let tempCount = 0
-	for(let regex of uaMap.get("L1").keys()){
-		totalCount++
-		tempCount++
-		let result = regex.exec(ua)
-		if(!!result){
-			let l2key = uaMap.get("L1").get(regex)
-			if(uaMap.get("L2").has(l2Key)){
-				let l2Map = uaMap.get("L2").get(l2Key)
-				for(let regex of l2Map.keys()){
-					totalCount++
-					tempCount++
-					let result = regex.exec(ua)
-					if(!!result){
-						hitCount++
-						if(tempCount > maxCount){
-							maxCount = tempCount
-						}
-						if(tempCount < minCount){
-							minCount = tempCount
-						}
-						return new ua(l2Map.get(regex), result[2], result[3], result[4])
-					}
+	this.add = (ua) => {
+		if(ua instanceof UA){
+			let family = ua.getFamily()
+			,	version = ua.getVersion()
+			if(hitMap[family] !== undefined){
+				let map = hitMap[family]
+				if(map[version] !== undefined){
+					map[version] = map[version] + 1
+				}else{
+					map[version] = 1
 				}
 			}else{
-				hitCount++
-				if(tempCount > maxCount){
-					maxCount = tempCount
-				}
-				if(tempCount < minCount){
-					minCount = tempCount
-				}
-				return new ua(l2Key, result[2], result[3], result[4])
+				let map = {}
+				map[version] = 1
+				hitMap[family] = map
 			}
 		}
 	}
-	if(tempCount > maxCount){
-		maxCount = tempCount
-	}
-	if(tempCount < minCount){
-		minCount = tempCount
-	}
-	return false
+
+	this.get = () => hitMap
 }
 
-let exec = function(src, callback){
-	if(!fs.existsSync(src)){
-		throw {
-			name: "FileNotExist",
-			msg: "src file is not exist."
+let Counter = function(){
+	let uaCount = 0
+	,	totalCount = 0
+	,	hitCount = 0
+	,	maxCount = 0
+	,	minCount = Infinity
+	,	counterTable = {}
+
+	this.add = (success, counter) => {
+		if(!!success){
+			hitCount++
 		}
+		uaCount++
+		totalCount += counter
+
+		if(counter > maxCount){
+			maxCount = counter
+		}
+		if(counter < minCount){
+			minCount = counter
+		}
+
+		if(!!success){
+			if(counterTable[counter] !== undefined){
+				counterTable[counter] = counterTable[counter] + 1
+			}else{
+				counterTable[counter] = 1
+			}
+		}
+	}
+
+	this.get = () => {
+		return {
+			uaCount: uaCount,
+			totalCount: totalCount,
+			hitCount: hitCount,
+			maxCount: maxCount,
+			minCount: minCount,
+			hitRate: hitCount / uaCount,
+			averageCount: totalCount / uaCount,
+		}
+	}
+}
+
+/*
+	input: ua string
+	output: {
+		result: ua object,
+		counter: number,
+	}
+*/
+let test = function(ua){
+	let counter = 0
+	,	mixCounter = (obj) => {
+		obj.counter = counter
+		return obj
+	}
+	,	success = (ua, regex) => {
+		if(!!cacheFlag && !!regex){
+			cache.load(ua.getFamily(), regex)
+		}
+		fs.writeSync(logFd, "-------------------------\n")
+		fs.writeSync(resultFd, ua.getFamily() + "\n")
+		return mixCounter({
+			result: ua
+		})
+	}
+	,	fail = () => {
+		fs.writeSync(logFd, "-------------------------\n")
+		fs.writeSync(resultFd, "Other\n")
+		return mixCounter({
+			result: false
+		})
+	}
+
+	if(!!cacheFlag){
+		let cacheResult = cache.match(ua)
+		counter += cacheResult.counter
+		if(!!cacheResult.UA){
+			return success(cacheResult.UA)
+		}
+	}
+
+	for(let lv1Name of Object.keys(uaList.L1)){
+		counter++
+		let lv1Regex = uaList.L1[lv1Name]
+		fs.writeSync(logFd, "LV1 : " + lv1Regex.source + "\n")
+		let lv1Result = lv1Regex.exec(ua)
+		if(!!lv1Result){
+			if(uaList.L2[lv1Name] !== undefined){
+				let lv2Obj = uaList.L2[lv1Name]
+				for(let lv2Name of Object.keys(lv2Obj)){
+					counter++
+					let lv2Regex = lv2Obj[lv2Name]
+					fs.writeSync(logFd, "LV2 : " + lv2Regex.source + "\n");
+					let lv2Result = lv2Regex.exec(ua)
+					if(!!lv2Result){
+						return success(new UA(lv2Name, lv2Result[1], lv2Result[2], lv2Result[3]), lv2Regex)
+					}
+				}
+				return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+			}else{
+				return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+			}
+		}
+	}
+
+	return fail()
+}
+
+let exec = function(ua, useCache){
+	let uaList = []
+	,	hitTable = new HitTable
+	, 	counter = new Counter
+
+	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w")
+	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w")
+
+	if(useCache === false){
+		cacheFlag = false
+	}else{
+		cacheFlag = true
+	}
+
+	if(ua instanceof Array){
+		uaList = ua.slice()
+	}else{
+		uaList.push(ua.toString())
+	}
+
+	for(let ua of uaList){
+		let result = test(ua)
+		counter.add(result.result, result.counter)
+		hitTable.add(result.result)
+	}
+
+	let result = counter.get()
+	result.hitTable = hitTable.get()
+	return result
+}
+
+let execFromFile = function(src, callback, useCache){
+	if(!fs.existsSync(src)){
+		throw new Error("src file is not exist.")
 	}
 
 	let lineReader = new linebylineReader(src)
-	,	hitTable = new Map
+	,	hitTable = new HitTable
+	,	counter = new Counter
+
+	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w")
+	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w")
+
+	if(useCache === false){
+		cacheFlag = false
+	}else{
+		cacheFlag = true
+	}
 
 	lineReader.on("err", (err) => {
-		throw {
-			name: "ReadError",
-			msg: err
-		}
+		throw new Error(err)
 	})
 
 	lineReader.on("line", (line) => {
-		uaCount++
 		let result = test(line)
-		
+		counter.add(result.result, result.counter)
+		hitTable.add(result.result)
 	})
 
 	lineReader.on("end", () => {
-		let result = {
-			totalCount: uaCount,
-			hitCount: hitCount,
-			hitRate: hitCount / uaCount,
-			maxCount: maxCount,
-			minCount: minCount,
-			averageCount: totalCount / uaCount,
-			hitTable: hitTable,
-		}
+		let result = counter.get()
+		result.hitTable = hitTable.get()
+
 		typeof callback === "function" && callback(result)
 	})
 }
 
-module.exports = exec
+module.exports = {
+	execFromFile: execFromFile,
+	exec: exec,
+}

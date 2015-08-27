@@ -1,10 +1,23 @@
 'use strict'
 
+let showdown = require("showdown")
+,	converter = new showdown.Converter({
+	tables: true,
+})
+
 let md = function(){
 	let mdText = ""
 
 	this.appendText = (text) => {
 		mdText = mdText.concat("### ", text, "\n")
+	}
+
+	this.appendMultilineText = (textArray) => {
+		let multilineText = ""
+		for(let text of textArray){
+			multilineText = multilineText.concat(text, "<br>")
+		}
+		mdText = mdText.concat(multilineText, "\n")
 	}
 
 	this.getMD = () => mdText
@@ -14,6 +27,30 @@ let md = function(){
 	}
 
 	this.createTable = () => new table
+
+	this.toHTML = () => pretty(converter.makeHtml(mdText))
+}
+
+let pretty = function(htmlStr){
+	let style = "\
+		<style>\
+			table{\
+				border-collapse: collapse;\
+				border-spacing: 0;\
+				line-height: 1.6;\
+			}\
+			tr:nth-child(even){\
+				background-color: white;\
+			}\
+			tr:nth-child(odd){\
+				background-color: rgb(248, 248, 248);\
+			}\
+			td{\
+				border: solid 1px rgb(221, 221, 221);\
+			}\
+		</style>\
+	"
+	return htmlStr.concat(style)
 }
 
 let table = function(){
@@ -37,6 +74,7 @@ let table = function(){
 			mdText = mdText.concat("|---")
 		}
 		mdText = mdText.concat("|\n")
+		hasHead = true
 	}
 
 	this.appendRow = () => {
@@ -47,6 +85,7 @@ let table = function(){
 		for(let i = 0 ; i < headCount ; i++){
 			let cell = cells[i]
 			if(cell !== undefined){
+				cell = cell.trim("\n")
 				mdText = mdText.concat("|", cell)
 			}else{
 				mdText = mdText.concat("|", "")

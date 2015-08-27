@@ -5,10 +5,7 @@ let fs = require("fs")
 
 let compare = function(src, target, callback){
 	if(!fs.existsSync(src) || !fs.existsSync(target)){
-		throw {
-			name: "FileNotExist",
-			msg: "src file or target file is not exist."
-		}
+		throw new Error("src file or target file is not exist.")
 	}
 
 	let srcReader = new linebylineReader(src)
@@ -20,22 +17,22 @@ let compare = function(src, target, callback){
 	, 	totalCount = 0
 	, 	srcEnd = false
 	,	targetEnd = false
-	,	unfitTable = new Map()
-	
-	unfitTable._set = function(srcLine, targetLine){
-		if(this.has(srcLine)){
-			let map = this.get(srcLine)
-			if(map.has(targetLine)){
-				map.set(targetLine, map.get(targetLine) + 1)
+	,	unfitTable = Object.create({
+		_set: function(srcLine, targetLine){
+			if(this[srcLine] !== undefined){
+				let obj = this[srcLine]
+				if(obj[targetLine] !== undefined){
+					obj[targetLine]++
+				}else{
+					obj[targetLine] = 1
+				}
 			}else{
-				map.set(targetLine, 1)
+				let obj = {}
+				obj[targetLine] = 1
+				this[srcLine] = obj
 			}
-		}else{
-			let map = new Map()
-			map.set(targetLine, 1)
-			this.set(srcLine, map)
 		}
-	}
+	})
 
 	srcReader.on("err", (err) => {
 		throw {

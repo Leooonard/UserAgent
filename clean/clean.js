@@ -7,10 +7,7 @@ let spiders = require("./spider.json")
 
 let clean = function(src, target, callback){
 	if(!fs.existsSync(src)){
-		throw {
-			name: "FileNotExist",
-			msg: "src file is not exist."
-		} 
+		throw new Error("src file is not exist.")
 	}
 
 	targetFd = fs.openSync(target, "w+")
