@@ -49,7 +49,10 @@ command:\n\
 		return
 	}
 
+	let startTimer = (new Date()).getTime()
 	execFromFile(srcFilePath, (result) => {
+		let endTimer = (new Date).getTime()
+		console.log(endTimer - startTimer)
 		let mdDoc = new md()
 		,	totalCount = result.totalCount || 0
 		,	hitCount = result.hitCount || 0

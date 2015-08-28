@@ -7,6 +7,7 @@ let linebylineReader = require("line-by-line")
 ,	uaList = require("./ua.json")
 ,	cache = require("./cache.js")
 ,	UA = require("./ua.js")
+,	ieOptimize = require("./optimize-ie.js")
 ,	logFd
 ,	resultFd
 ,	cacheFlag
@@ -136,6 +137,11 @@ let test = function(ua){
 		let lv1Result = lv1Regex.exec(ua)
 		if(!!lv1Result){
 			if(uaList.L2[lv1Name] !== undefined){
+				//先做优化判断.
+				if(ieOptimize.optimize(ua, lv1Name)){
+					return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+				}
+
 				let lv2Obj = uaList.L2[lv1Name]
 				for(let lv2Name of Object.keys(lv2Obj)){
 					counter++
