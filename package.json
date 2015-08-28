@@ -25,5 +25,10 @@
   },
   "bin": {
     "ua": "index.js"
+  },
+  "devDependencies": {
+    "gulp": "gulpjs/gulp#4.0",
+    "gulp-babel": "^5.2.1",
+    "gulp-cli": "gulpjs/gulp-cli#4.0"
   }
 }

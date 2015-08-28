@@ -45,8 +45,7 @@ command:\n\
 	}
 
 	if(!srcFilePath){
-		console.error("err: missing file path, use this command like node index.js exec [-c] src [result]")
-		return
+		throw new Error("err: missing file path, use this command like node index.js exec [-c] src [result]")
 	}
 
 	let startTimer = (new Date()).getTime()
@@ -109,8 +108,7 @@ command:\n\
 	let srcFilePath = args[1]
 	let targetFilePath = args[2]
 	if(!srcFilePath || !targetFilePath){
-		console.error('err: missing file path, use this command like node index.js clean src target.')
-		return
+		throw new Error('err: missing file path, use this command like node index.js clean src target.')
 	}
 
 	clean(srcFilePath, targetFilePath, () => {
@@ -122,8 +120,7 @@ command:\n\
 	let targetFilePath = args[2]
 	let resultFilePath = args[3]
 	if(!srcFilePath || !targetFilePath){
-		console.error("err: missing file path, use this command like node index.js compare src target.")
-		return
+		throw new Error("err: missing file path, use this command like node index.js compare src target.")
 	}
 
 	compare(srcFilePath, targetFilePath, (result) => {
