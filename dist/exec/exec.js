@@ -100,6 +100,7 @@ var Counter = function Counter() {
 		counter: number,
 	}
 */
+var testCounter = 0;
 var test = function test(ua, useCache, useOptimization) {
 	var counter = 0,
 	    mixCounter = function mixCounter(obj) {
@@ -129,6 +130,8 @@ var test = function test(ua, useCache, useOptimization) {
 		counter += cacheResult.counter;
 		if (!!cacheResult.UA) {
 			return success(cacheResult.UA);
+		} else {
+			console.log(testCounter++);
 		}
 	}
 
@@ -267,7 +270,7 @@ var execFromArray = function execFromArray(srcArray, option, callback) {
 	}
 };
 
-var execFromFile = function execFromFile(src, useCache, useOptimization) {
+var execFromFile = function execFromFile(src, useCache, useOptimization, callback) {
 	if (!fs.existsSync(src)) {
 		throw new Error("src file is not exist.");
 	}

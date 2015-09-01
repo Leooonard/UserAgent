@@ -156,8 +156,8 @@ command list:\n\
 		)
 	})
 }else if(command === CLEAN_COMMAND){
-	let srcFilePath = args[1]
-	let targetFilePath = args[2]
+	let srcFilePath = args[0]
+	let targetFilePath = args[1]
 	if(!srcFilePath || !targetFilePath){
 		throw new Error('err: missing src or target argument.')
 	}
@@ -167,9 +167,9 @@ command list:\n\
 	})
 
 }else if(command === COMPARE_COMMAND){
-	let srcFilePath = args[1]
-	let targetFilePath = args[2]
-	let resultFilePath = args[3]
+	let srcFilePath = args[0]
+	let targetFilePath = args[1]
+	let resultFilePath = args[2]
 	if(!srcFilePath || !targetFilePath){
 		throw new Error("err: missing src or target argument.")
 	}

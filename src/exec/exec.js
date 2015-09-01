@@ -98,6 +98,7 @@ let Counter = function(){
 		counter: number,
 	}
 */
+let testCounter = 0
 let test = function(ua, useCache, useOptimization){
 	let counter = 0
 	,	mixCounter = (obj) => {
@@ -127,6 +128,8 @@ let test = function(ua, useCache, useOptimization){
 		counter += cacheResult.counter
 		if(!!cacheResult.UA){
 			return success(cacheResult.UA)
+		}else{
+			console.log(testCounter++)
 		}
 	}
 
@@ -200,7 +203,7 @@ let execFromArray = function(srcArray, option, callback){
 	}
 }
 
-let execFromFile = function(src, useCache, useOptimization){
+let execFromFile = function(src, useCache, useOptimization, callback){
 	if(!fs.existsSync(src)){
 		throw new Error("src file is not exist.")
 	}

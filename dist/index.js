@@ -206,8 +206,8 @@ command list:\n\
 		});
 	})();
 } else if (command === CLEAN_COMMAND) {
-	var srcFilePath = args[1];
-	var targetFilePath = args[2];
+	var srcFilePath = args[0];
+	var targetFilePath = args[1];
 	if (!srcFilePath || !targetFilePath) {
 		throw new Error('err: missing src or target argument.');
 	}
@@ -217,9 +217,9 @@ command list:\n\
 	});
 } else if (command === COMPARE_COMMAND) {
 	(function () {
-		var srcFilePath = args[1];
-		var targetFilePath = args[2];
-		var resultFilePath = args[3];
+		var srcFilePath = args[0];
+		var targetFilePath = args[1];
+		var resultFilePath = args[2];
 		if (!srcFilePath || !targetFilePath) {
 			throw new Error("err: missing src or target argument.");
 		}

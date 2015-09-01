@@ -15,7 +15,7 @@ cacheArray = [],
 hitCount = 0,
     missCount = 0,
     cacheCount = 0,
-    LRU = require("lru-cache")(5000);
+    LRU = require("lru-cache")(1000);
 
 // let match = function(ua){
 // 	let counter = 0
