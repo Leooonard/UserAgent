@@ -40,7 +40,8 @@ command list:\n\
 		option = undefined
 		resultFilePath = undefined
 	}else if(args.length === 2){
-		if(option !== CACHE_FLAG){
+		let regex = /^-([cof])(?:(?=$)|(?!\1))([cof])?(?:(?=$)|(?!(?:\1|\2)))([cof])?$/i
+		if(!regex.test(option)){
 			resultFilePath = srcFilePath
 			srcFilePath = option
 			option = undefined
@@ -63,7 +64,7 @@ command list:\n\
 		let useCache = false
 		,	useOptimization = false
 		,	useFile = false
-		,	regex = /^([cof])(?:(?=$)|(?!\1))([cof])?(?:(?=$)|(?!(?:\1|\2)))([cof])?$/i
+		,	regex = /^-([cof])(?:(?=$)|(?!\1))([cof])?(?:(?=$)|(?!(?:\1|\2)))([cof])?$/i
 		,	result = regex.exec(option)
 		if(result === null){
 			option = defaultOption
@@ -92,7 +93,7 @@ command list:\n\
 		endTimer = (new Date).getTime()
 
 		if(!option.useFile){ //只验证一句ua的话, 直接输出分析结果即可.
-			console.log(result)
+			console.log(result.getFamily() + ":" + result.getVersion())
 			return
 		}
 

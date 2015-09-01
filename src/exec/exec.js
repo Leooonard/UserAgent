@@ -1,16 +1,16 @@
 'use strict'
 
 let linebylineReader = require("line-by-line")
-,	show = require("../show.js")
 ,	fs = require("fs")
 ,	path = require("path")
-,	uaList = require("./ua.json")
+,	show = require("../show.js")
+,	uaList = require("../../static/ua.json")
 ,	cache = require("./cache.js")
 ,	UA = require("./ua.js")
 ,	ieOptimize = require("./optimize-ie.js")
+,	chromeOptimize = require("./optimize-chrome.js")
 ,	logFd
 ,	resultFd
-,	cacheFlag
 
 //将json转换为map.
 Object.keys(uaList.L1).forEach((val, idx, array) => {
@@ -98,20 +98,20 @@ let Counter = function(){
 		counter: number,
 	}
 */
-let test = function(ua){
+let test = function(ua, useCache, useOptimization){
 	let counter = 0
 	,	mixCounter = (obj) => {
 		obj.counter = counter
 		return obj
 	}
-	,	success = (ua, regex) => {
-		if(!!cacheFlag && !!regex){
-			cache.load(ua.getFamily(), regex)
+	,	success = (uaObject) => {
+		if(!!useCache){
+			cache.load(ua, uaObject)
 		}
 		fs.writeSync(logFd, "-------------------------\n")
-		fs.writeSync(resultFd, ua.getFamily() + "\n")
+		fs.writeSync(resultFd, uaObject.getFamily() + "\n")
 		return mixCounter({
-			result: ua
+			result: uaObject
 		})
 	}
 	,	fail = () => {
@@ -122,7 +122,7 @@ let test = function(ua){
 		})
 	}
 
-	if(!!cacheFlag){
+	if(!!useCache){
 		let cacheResult = cache.match(ua)
 		counter += cacheResult.counter
 		if(!!cacheResult.UA){
@@ -138,8 +138,14 @@ let test = function(ua){
 		if(!!lv1Result){
 			if(uaList.L2[lv1Name] !== undefined){
 				//先做优化判断.
-				if(ieOptimize.optimize(ua, lv1Name)){
-					return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+				if(!!useOptimization){
+					console.log(ua)
+					if(ieOptimize.optimize(ua, lv1Name)){
+						return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+					}
+					if(chromeOptimize.optimize(ua, lv1Name)){
+						return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
+					}
 				}
 
 				let lv2Obj = uaList.L2[lv1Name]
@@ -149,7 +155,7 @@ let test = function(ua){
 					fs.writeSync(logFd, "LV2 : " + lv2Regex.source + "\n");
 					let lv2Result = lv2Regex.exec(ua)
 					if(!!lv2Result){
-						return success(new UA(lv2Name, lv2Result[1], lv2Result[2], lv2Result[3]), lv2Regex)
+						return success(new UA(lv2Name, lv2Result[1], lv2Result[2], lv2Result[3]))
 					}
 				}
 				return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]))
@@ -162,38 +168,40 @@ let test = function(ua){
 	return fail()
 }
 
-let exec = function(ua, useCache){
+let exec = function(ua, option, callback){
 	let uaList = []
 	,	hitTable = new HitTable
 	, 	counter = new Counter
 
-	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w")
-	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w")
+	logFd = fs.openSync(path.join(__dirname, "../../static/exec-log.log"), "w")
+	resultFd = fs.openSync(path.join(__dirname, "../../static/exec-result.log"), "w")
 
-	if(useCache === false){
-		cacheFlag = false
+	if(option.useFile){
+		execFromFile(ua, option.useCache, option.useOptimization, callback)
 	}else{
-		cacheFlag = true
+		execFromString(ua, option.useCache, option.useOptimization, callback)
 	}
-
-	if(ua instanceof Array){
-		uaList = ua.slice()
-	}else{
-		uaList.push(ua.toString())
-	}
-
-	for(let ua of uaList){
-		let result = test(ua)
-		counter.add(result.result, result.counter)
-		hitTable.add(result.result)
-	}
-
-	let result = counter.get()
-	result.hitTable = hitTable.get()
-	return result
 }
 
-let execFromFile = function(src, callback, useCache){
+let execFromString = function(src, useCache, useOptimization, callback){
+	let result = test(src.toString(), useCache, useOptimization).result
+	typeof callback === "function" && callback(result)
+}
+
+let execFromArray = function(srcArray, option, callback){
+	if(!(srcArray instanceof Array)){
+		return []
+	}else{
+		let uaArray = []
+		for(let ua of srcArray){
+			let result = test(ua.toString(), !!option.useCache, !!option.useOptimization)
+			uaArray.push(result)
+		}
+		callback(uaArray)
+	}
+}
+
+let execFromFile = function(src, useCache, useOptimization){
 	if(!fs.existsSync(src)){
 		throw new Error("src file is not exist.")
 	}
@@ -205,19 +213,13 @@ let execFromFile = function(src, callback, useCache){
 	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w")
 	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w")
 
-	if(useCache === false){
-		cacheFlag = false
-	}else{
-		cacheFlag = true
-	}
-
 	lineReader.on("err", (err) => {
 		throw new Error(err)
 	})
 
 	lineReader.on("line", (line) => {
-		let result = test(line)
-		counter.add(result.result, result.counter)
+		let result = test(line, useCache, useOptimization)
+		counter.add(!!result.result, result.counter)
 		hitTable.add(result.result)
 	})
 
@@ -230,6 +232,6 @@ let execFromFile = function(src, callback, useCache){
 }
 
 module.exports = {
-	execFromFile: execFromFile,
 	exec: exec,
+	analyze: execFromArray,
 }

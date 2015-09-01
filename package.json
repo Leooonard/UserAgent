@@ -2,7 +2,7 @@
   "name": "ua",
   "version": "1.0.0",
   "description": "parse ua",
-  "main": "index.js",
+  "main": "dist/ua.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,14 +21,16 @@
   "homepage": "https://github.com/Leooonard/UserAgent#readme",
   "dependencies": {
     "line-by-line": "^0.1.4",
-    "showdown": "^1.2.3"
+    "showdown": "^1.2.3",
+    "lru-cache": "^2.6.5"
   },
   "bin": {
-    "ua": "index.js"
+    "ua": "dist/index.js"
   },
   "devDependencies": {
     "gulp": "gulpjs/gulp#4.0",
     "gulp-babel": "^5.2.1",
-    "gulp-cli": "gulpjs/gulp-cli#4.0"
+    "gulp-cli": "gulpjs/gulp-cli#4.0",
+    "gulp-sourcemaps": "^1.5.2"
   }
 }

@@ -1,16 +1,16 @@
 'use strict';
 
 var linebylineReader = require("line-by-line"),
-    show = require("../show.js"),
     fs = require("fs"),
     path = require("path"),
-    uaList = require("./ua.json"),
+    show = require("../show.js"),
+    uaList = require("../../static/ua.json"),
     cache = require("./cache.js"),
     UA = require("./ua.js"),
     ieOptimize = require("./optimize-ie.js"),
+    chromeOptimize = require("./optimize-chrome.js"),
     logFd = undefined,
-    resultFd = undefined,
-    cacheFlag = undefined;
+    resultFd = undefined;
 
 //将json转换为map.
 Object.keys(uaList.L1).forEach(function (val, idx, array) {
@@ -100,20 +100,20 @@ var Counter = function Counter() {
 		counter: number,
 	}
 */
-var test = function test(ua) {
+var test = function test(ua, useCache, useOptimization) {
 	var counter = 0,
 	    mixCounter = function mixCounter(obj) {
 		obj.counter = counter;
 		return obj;
 	},
-	    success = function success(ua, regex) {
-		if (!!cacheFlag && !!regex) {
-			cache.load(ua.getFamily(), regex);
+	    success = function success(uaObject) {
+		if (!!useCache) {
+			cache.load(ua, uaObject);
 		}
 		fs.writeSync(logFd, "-------------------------\n");
-		fs.writeSync(resultFd, ua.getFamily() + "\n");
+		fs.writeSync(resultFd, uaObject.getFamily() + "\n");
 		return mixCounter({
-			result: ua
+			result: uaObject
 		});
 	},
 	    fail = function fail() {
@@ -124,7 +124,7 @@ var test = function test(ua) {
 		});
 	};
 
-	if (!!cacheFlag) {
+	if (!!useCache) {
 		var cacheResult = cache.match(ua);
 		counter += cacheResult.counter;
 		if (!!cacheResult.UA) {
@@ -147,8 +147,14 @@ var test = function test(ua) {
 			if (!!lv1Result) {
 				if (uaList.L2[lv1Name] !== undefined) {
 					//先做优化判断.
-					if (ieOptimize.optimize(ua, lv1Name)) {
-						return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]));
+					if (!!useOptimization) {
+						console.log(ua);
+						if (ieOptimize.optimize(ua, lv1Name)) {
+							return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]));
+						}
+						if (chromeOptimize.optimize(ua, lv1Name)) {
+							return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]));
+						}
 					}
 
 					var lv2Obj = uaList.L2[lv1Name];
@@ -165,7 +171,7 @@ var test = function test(ua) {
 							fs.writeSync(logFd, "LV2 : " + lv2Regex.source + "\n");
 							var lv2Result = lv2Regex.exec(ua);
 							if (!!lv2Result) {
-								return success(new UA(lv2Name, lv2Result[1], lv2Result[2], lv2Result[3]), lv2Regex);
+								return success(new UA(lv2Name, lv2Result[1], lv2Result[2], lv2Result[3]));
 							}
 						}
 					} catch (err) {
@@ -207,59 +213,62 @@ var test = function test(ua) {
 	return fail();
 };
 
-var exec = function exec(ua, useCache) {
+var exec = function exec(ua, option, callback) {
 	var uaList = [],
 	    hitTable = new HitTable(),
 	    counter = new Counter();
 
-	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w");
-	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w");
+	logFd = fs.openSync(path.join(__dirname, "../../static/exec-log.log"), "w");
+	resultFd = fs.openSync(path.join(__dirname, "../../static/exec-result.log"), "w");
 
-	if (useCache === false) {
-		cacheFlag = false;
+	if (option.useFile) {
+		execFromFile(ua, option.useCache, option.useOptimization, callback);
 	} else {
-		cacheFlag = true;
+		execFromString(ua, option.useCache, option.useOptimization, callback);
 	}
-
-	if (ua instanceof Array) {
-		uaList = ua.slice();
-	} else {
-		uaList.push(ua.toString());
-	}
-
-	var _iteratorNormalCompletion3 = true;
-	var _didIteratorError3 = false;
-	var _iteratorError3 = undefined;
-
-	try {
-		for (var _iterator3 = uaList[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-			var _ua = _step3.value;
-
-			var _result = test(_ua);
-			counter.add(_result.result, _result.counter);
-			hitTable.add(_result.result);
-		}
-	} catch (err) {
-		_didIteratorError3 = true;
-		_iteratorError3 = err;
-	} finally {
-		try {
-			if (!_iteratorNormalCompletion3 && _iterator3["return"]) {
-				_iterator3["return"]();
-			}
-		} finally {
-			if (_didIteratorError3) {
-				throw _iteratorError3;
-			}
-		}
-	}
-
-	var result = counter.get();
-	result.hitTable = hitTable.get();
-	return result;
 };
 
-var execFromFile = function execFromFile(src, callback, useCache) {
+var execFromString = function execFromString(src, useCache, useOptimization, callback) {
+	var result = test(src.toString(), useCache, useOptimization).result;
+	typeof callback === "function" && callback(result);
+};
+
+var execFromArray = function execFromArray(srcArray, option, callback) {
+	if (!(srcArray instanceof Array)) {
+		return [];
+	} else {
+		var uaArray = [];
+		var _iteratorNormalCompletion3 = true;
+		var _didIteratorError3 = false;
+		var _iteratorError3 = undefined;
+
+		try {
+			for (var _iterator3 = srcArray[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+				var ua = _step3.value;
+
+				var result = test(ua.toString(), !!option.useCache, !!option.useOptimization);
+				uaArray.push(result);
+			}
+		} catch (err) {
+			_didIteratorError3 = true;
+			_iteratorError3 = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion3 && _iterator3["return"]) {
+					_iterator3["return"]();
+				}
+			} finally {
+				if (_didIteratorError3) {
+					throw _iteratorError3;
+				}
+			}
+		}
+
+		callback(uaArray);
+	}
+};
+
+var execFromFile = function execFromFile(src, useCache, useOptimization) {
 	if (!fs.existsSync(src)) {
 		throw new Error("src file is not exist.");
 	}
@@ -271,19 +280,13 @@ var execFromFile = function execFromFile(src, callback, useCache) {
 	logFd = fs.openSync(path.join(__dirname, "exec-log.log"), "w");
 	resultFd = fs.openSync(path.join(__dirname, "exec-result.log"), "w");
 
-	if (useCache === false) {
-		cacheFlag = false;
-	} else {
-		cacheFlag = true;
-	}
-
 	lineReader.on("err", function (err) {
 		throw new Error(err);
 	});
 
 	lineReader.on("line", function (line) {
-		var result = test(line);
-		counter.add(result.result, result.counter);
+		var result = test(line, useCache, useOptimization);
+		counter.add(!!result.result, result.counter);
 		hitTable.add(result.result);
 	});
 
@@ -296,6 +299,6 @@ var execFromFile = function execFromFile(src, callback, useCache) {
 };
 
 module.exports = {
-	execFromFile: execFromFile,
-	exec: exec
+	exec: exec,
+	analyze: execFromArray
 };

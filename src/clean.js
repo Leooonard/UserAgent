@@ -1,6 +1,6 @@
 'use strict'
 
-let spiders = require("./spider.json")
+let spiders = require("../static/spider.json")
 ,	linebylineReader = require("line-by-line")
 ,	fs = require("fs")
 ,	targetFd
