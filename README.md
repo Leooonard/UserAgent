@@ -1,2 +1,2 @@
 # UserAgent
-try node --harmony index.js help
+npm install && ua help
