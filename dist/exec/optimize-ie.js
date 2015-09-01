@@ -54,7 +54,7 @@ var optimize = function optimize(ua, name) {
 
 					segement = segement.trim();
 					segement = segement.toLowerCase();
-					if (segement.startsWith(ieSegement.toLowerCase())) {
+					if (segement.indexOf(ieSegement.toLowerCase()) === 0) {
 						flag = true;
 						break;
 					}

@@ -148,7 +148,6 @@ var test = function test(ua, useCache, useOptimization) {
 				if (uaList.L2[lv1Name] !== undefined) {
 					//先做优化判断.
 					if (!!useOptimization) {
-						console.log(ua);
 						if (ieOptimize.optimize(ua, lv1Name)) {
 							return success(new UA(lv1Name, lv1Result[1], lv1Result[2], lv1Result[3]));
 						}

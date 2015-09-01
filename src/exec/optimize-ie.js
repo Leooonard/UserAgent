@@ -40,7 +40,7 @@ let optimize = function(ua, name){
 		for(let ieSegement of IE_SEGEMENTS){
 			segement = segement.trim()
 			segement = segement.toLowerCase()
-			if(segement.startsWith(ieSegement.toLowerCase())){
+			if(segement.indexOf(ieSegement.toLowerCase()) === 0){
 				flag = true
 				break
 			}
