@@ -9,11 +9,14 @@ gulp.task("compile", function(){
 			.pipe(gulp.dest("dist"))
 })
 
-gulp.task("json", function(){
-    return gulp.src("src/**/*.json")
+gulp.task("mv", function(){
+    return gulp.src([
+                "src/**/*.json",
+                "src/**/*.log",
+            ])
             .pipe(gulp.dest("dist"))
 })
 
 gulp.task("watch", function(){
-    gulp.watch("src/**/*.js", gulp.series("compile", "json"))
+    gulp.watch("src/**/*.js", gulp.series("compile", "mv"))
 })

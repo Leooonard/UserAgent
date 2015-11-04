@@ -8,11 +8,13 @@ let fs = require("fs")
 ,	processFile = require("./command/file.js")
 ,	processOne = require("./command/one.js")
 ,	processHelp = require("./command/help.js")
+,	processClean = require("./command/clean.js")
 
 const COMMAND_MAP = {
 	file: processFile,
 	one: processOne,
 	help: processHelp,
+	clean: processClean,
 }
 
 let {command, params} = processArgs(process.argv)

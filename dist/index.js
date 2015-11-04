@@ -7,12 +7,14 @@ var fs = require("fs"),
     processArgs = require("./lib/input.js"),
     processFile = require("./command/file.js"),
     processOne = require("./command/one.js"),
-    processHelp = require("./command/help.js");
+    processHelp = require("./command/help.js"),
+    processClean = require("./command/clean.js");
 
 var COMMAND_MAP = {
 	file: processFile,
 	one: processOne,
-	help: processHelp
+	help: processHelp,
+	clean: processClean
 };
 
 var _processArgs = processArgs(process.argv);

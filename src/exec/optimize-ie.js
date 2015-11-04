@@ -15,20 +15,15 @@ let optimize = function(ua, name){
 	if(typeof ua !== "string" || !isTarget(name)){
 		return false
 	}
-	let openParentCount = 0
-	,	openParentPos = -1
-	,	closeParentCount = 0
-
-	for(var i = 0 ; i < ua.length ; i++){
-		if(ua.charAt(i) === "("){
-			openParentCount++
-			openParentPos = i
-		}else if(ua.charAt(i) === ")"){
-			closeParentCount++
-		}
+	
+	let openParentPos = -1
+	
+	if((openParentPos = ua.indexOf("(")) === -1 || ua.charAt(ua.length - 1) !== ")"){
+		return false
 	}
 
-	if(openParentCount !== 1 || closeParentCount !== 1 || ua[ua.length - 1] !== ")"){
+	ua = ua.slice(openParentPos + 1, -1)
+	if(ua.indexOf("(") !== -1 || ua.indexOf(")") !== -1){
 		return false
 	}
 

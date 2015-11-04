@@ -1,7 +1,7 @@
 "use strict"
 
 let lru = require("lru-cache")
-,   lruCache = new lru(1000)
+,   lruCache = new lru(5000)
 
 let cache = {
     has(ua){

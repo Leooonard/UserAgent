@@ -1,11 +1,13 @@
 //parse useragents.
 
-var parse = require("../lib/parser.js")
+let parse = require("../lib/parser.js")
+,   printer = require("../lib/print.js")
 
 function processOne(uas){
     for(let ua of uas){        
         let result = parse(ua)
-        console.log(result)
+        result["useragent"] = ua
+        printer.printPrettyObject(result)
     }
 }
 

@@ -1,22 +1,19 @@
-//parse useragents.
+//print data.
 
 "use strict";
 
-var parse = require("../lib/parser.js"),
-    printer = require("../lib/print.js");
+function printPrettyObject(obj) {
+    console.log("{");
 
-function processOne(uas) {
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
 
     try {
-        for (var _iterator = uas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var ua = _step.value;
+        for (var _iterator = Object.keys(obj)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var key = _step.value;
 
-            var result = parse(ua);
-            result["useragent"] = ua;
-            printer.printPrettyObject(result);
+            console.log("   ", key, ":", obj[key]);
         }
     } catch (err) {
         _didIteratorError = true;
@@ -32,6 +29,8 @@ function processOne(uas) {
             }
         }
     }
+
+    console.log("}\n");
 }
 
-module.exports = processOne;
+exports.printPrettyObject = printPrettyObject;
