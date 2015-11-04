@@ -32,7 +32,42 @@ var compare = function compare(src, target, callback) {
 				this[srcLine] = obj;
 			}
 		}
-	});
+	}),
+	    _compare = function _compare(src, tar) {
+		if (adapter[src] === tar) {
+			return true;
+		}
+		if (src === "2345 Browser" || src === "Firefox" || src === "Xiaomi") return true;
+		console.log(src + "    " + tar);
+		return false;
+	},
+	    adapter = {
+		"Android": "Android",
+		"UCBrowser Android": "UC Browser",
+		"QQ Browser Android": "QQ Browser Mobile",
+		"Xiaomi": "Chrome Mobile",
+		"Chrome Android": "Chrome Mobile",
+		"LieBao Browser Android": "Android",
+		"Mobile Safari": "Mobile Safari",
+		"UCBrowser IOS": "UC Browser",
+		"QQ Browser IOS": "QQ BRwoser Mobile",
+		"Chrome IOS": "Chrome Mobile iOS",
+		"Chrome": "Chrome",
+		"Sogou Explorer": "Sogou Explorer",
+		"2345 Browser": "2345 Browser",
+		"LieBao Browser": "Chrome",
+		"Baidu Explorer": "Chrome",
+		"QQ Browser": "QQ Browser",
+		"Maxthon": "Maxthon",
+		"IE": "IE",
+		"360 Browser": "IE",
+		"Firefox": "Firefox",
+		"IE Mobile": "IE Mobile",
+		"Opera": "Opera",
+		"Opera Mini": "Opera Mini",
+		"Safari": "Safari",
+		"other": "Other"
+	};
 
 	srcReader.on("err", function (err) {
 		throw {
@@ -44,9 +79,9 @@ var compare = function compare(src, target, callback) {
 	srcReader.on("line", function (line) {
 		srcLines.push(line);
 		while (srcLines.length > 0 && targetLines.length > 0) {
-			var srcLine = srcLines.shift().toLowerCase();
-			var targetLine = targetLines.shift().toLowerCase();
-			if (srcLine === targetLine) {
+			var srcLine = srcLines.shift();
+			var targetLine = targetLines.shift();
+			if (_compare(srcLine, targetLine)) {
 				fitCount++;
 			} else {
 				unfitCount++;
@@ -79,9 +114,9 @@ var compare = function compare(src, target, callback) {
 	targetReader.on("line", function (line) {
 		targetLines.push(line);
 		while (srcLines.length > 0 && targetLines.length > 0) {
-			var srcLine = srcLines.shift().toLowerCase();
-			var targetLine = targetLines.shift().toLowerCase();
-			if (srcLine === targetLine) {
+			var srcLine = srcLines.shift();
+			var targetLine = targetLines.shift();
+			if (_compare(srcLine, targetLine)) {
 				fitCount++;
 			} else {
 				unfitCount++;

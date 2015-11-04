@@ -4,23 +4,19 @@ var linebylineReader = require("line-by-line"),
     fs = require("fs"),
     path = require("path"),
     show = require("../show.js"),
-    uaList = require("../../static/ua.json"),
     cache = require("./cache.js"),
-    UA = require("./ua.js"),
+
+// ,	loader = require("./loader.js")
+// ,	generator = require("./generator.js")
+UA = require("./ua.js"),
+    counter = require("./counter.js"),
     ieOptimize = require("./optimize-ie.js"),
     chromeOptimize = require("./optimize-chrome.js"),
     logFd = undefined,
-    resultFd = undefined;
+    resultFd = undefined,
+    testArray = loader.standardLoader("../../static/standard.json"); //testArray中存放已规格化的JSON对象.
 
-//将json转换为map.
-Object.keys(uaList.L1).forEach(function (val, idx, array) {
-	uaList.L1[val] = new RegExp(uaList.L1[val], "i");
-});
-Object.keys(uaList.L2).forEach(function (val, idx, array) {
-	Object.keys(uaList.L2[val]).forEach(function (v, i, arr) {
-		uaList.L2[val][v] = new RegExp(uaList.L2[val][v], "i");
-	});
-});
+testArray = generator.generate(testArray);
 
 var HitTable = function HitTable() {
 	var hitMap = {};
@@ -100,6 +96,7 @@ var Counter = function Counter() {
 		counter: number,
 	}
 */
+
 var testCounter = 0;
 var test = function test(ua, useCache, useOptimization) {
 	var counter = 0,
@@ -130,8 +127,6 @@ var test = function test(ua, useCache, useOptimization) {
 		counter += cacheResult.counter;
 		if (!!cacheResult.UA) {
 			return success(cacheResult.UA);
-		} else {
-			console.log(testCounter++);
 		}
 	}
 
@@ -249,7 +244,7 @@ var execFromArray = function execFromArray(srcArray, option, callback) {
 				var ua = _step3.value;
 
 				var result = test(ua.toString(), !!option.useCache, !!option.useOptimization);
-				uaArray.push(result);
+				uaArray.push(result.result);
 			}
 		} catch (err) {
 			_didIteratorError3 = true;
