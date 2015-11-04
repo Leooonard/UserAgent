@@ -1,0 +1,196 @@
+[
+	{
+		"family": "Android",
+		"test": "Android[ /]?(\\d+)\\.(\\d+)",
+		"testType": "regexp",
+		"children": [
+			{
+				"family": "UCBrowser Android",
+				"test": "UCBrowser",
+				"testType": "string",
+				"retest": "UCBrowser(?:-CMCC)?/(\\d+)\\.(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "QQBrowser Android",
+				"test": "MQQBrowser",
+				"testType": "string",
+				"retest": "MQQBrowser\\/(\\d)\\.(\\d)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Xiaomi Android",
+				"test": "MiuiBrowser",
+				"testType": "string",
+				"retest": "MiuiBrowser/(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Chrome Android",
+				"test": "Chrome\\/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+) Mobile Safari\\/\\d\\d\\d\\.\\d\\d$",
+				"testType": "regexp"
+			},
+			{
+				"family": "LieBao Browser Android",
+				"test": "LieBaoFast",
+				"testType": "string",
+				"retest": "LieBaoFast\\/(\\d)\\.(\\d+)\\.(\\d)",
+				"retestType": "regexp"
+			}
+		]
+	},
+	{
+		"family": "Mobile Safari",
+		"test": "(?:iPod|iPhone|iPad)",
+		"testType": "regexp",
+		"children": [
+			{
+				"family": "UCBrowser IOS",
+				"test": "UCBrowser",
+				"testType": "string",
+				"retest": "UCBrowser\\/(\\d+)\\.(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "QQBrowser IOS",
+				"test": "MQQBrowser",
+				"testType": "string",
+				"retest": "MQQBrowser\\/\\d\\.\\d",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Chrome IOS",
+				"test": "CriOS",
+				"testType": "string",
+				"retest": "CriOS\\/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			}
+		]		
+	},
+	{
+		"family": "Chrome",
+		"test": "Chrome\\/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)",
+		"testType": "regexp",
+		"children": [
+			{
+				"family": "Sogou Explorer",
+				"test": "MetaSr",
+				"testType": "string",
+				"retest": "MetaSr (\\d)\\.(\\d)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "2345 Browser",
+				"test": "2345chrome",
+				"testType": "string",
+				"retest": "2345chrome v(\\d)\\.(\\d)\\.(\\d)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "2345 Browser",
+				"test": "2345Explorer",
+				"testType": "string",
+				"retest": "2345Explorer\\/(\\d)\\.(\\d)\\.(\\d)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "LieBao Browser",
+				"test": "LBBROWSER",
+				"testType": "string"
+			},
+			{
+				"family": "Baidu Explorer",
+				"test": "BIDUBrowser",
+				"testType": "string",
+				"retest": "BIDUBrowser\\/(\\d)\\.([0-9x])",
+				"retestType": "regexp"
+			},
+			{
+				"family": "QQ Browser",
+				"test": "QQBrowser",
+				"testType": "string",
+				"retest": "QQBrowser\\/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Maxthon",
+				"test": "Maxthon",
+				"testType": "string",
+				"retest": "Maxthon\\/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)",
+				"retestType": "regexp"
+			}
+		]
+	},
+	{
+		"family": "IE",
+		"test": "(?:MSIE|Trident)[ \\/](\\d+)\\.(\\d+)",
+		"testType": "regexp",
+		"children": [
+			{
+				"family": "360 Browser",
+				"test": "360SE",
+				"testType": "string"
+			},
+			{
+				"family": "Sogou Explorer",
+				"test": "MetaSr",
+				"testType": "string",
+				"retest": "MetaSr (\\d)\\.(\\d)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Maxthon",
+				"test": "Maxthon",
+				"testType": "string",
+				"retest": "Maxthon (\\d)\\.(\\d)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "2345 Browser",
+				"test": "2345Explorer",
+				"testType": "string",
+				"retest": "2345Explorer (\\d)\\.(\\d)\\.(\\d)\\.(\\d+)",
+				"retestType": "regexp"
+			},
+			{
+				"family": "QQ Browser",
+				"test": "QQBrowser",
+				"testType": "string",
+				"retest": "QQBrowser\\/(\\d+)\\.(\\d+)(?:\\.(\\d+)\\.(\\d+))?",
+				"retestType": "regexp"
+			},
+			{
+				"family": "Tencent Browser",
+				"test": "TencentTraveler",
+				"testType": "string",
+				"retest": "TencentTraveler (\\d)\\.(\\d)",
+				"retestType": "regexp"
+			}	
+		]
+	},
+	{
+		"family": "Firefox",
+		"test": "Firefox\\/(\\d+)\\.(\\d+)",
+		"testType": "regexp"
+	},
+	{
+		"family": "IE Mobile",
+		"test": "IEMobile[ \\/](\\d+)\\.(\\d+)",
+		"testType": "regexp"
+	},
+	{
+		"family": "Opera",
+		"test": "(?:Opera|OPR)[\\/ ](\\d+)\\.(\\d+)",
+		"testType": "regexp"
+	},
+	{
+		"family": "Opera Mini",
+		"test": "Opera Mini\\/(\\d+)\\.(\\d+)",
+		"testType": "regexp"
+	},
+	{
+		"family": "Safari",
+		"test": "Version\\/(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*Safari\\/",
+		"testType": "regexp"
+	}
+]

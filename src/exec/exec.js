@@ -4,23 +4,18 @@ let linebylineReader = require("line-by-line")
 ,	fs = require("fs")
 ,	path = require("path")
 ,	show = require("../show.js")
-,	uaList = require("../../static/ua.json")
 ,	cache = require("./cache.js")
+// ,	loader = require("./loader.js")
+// ,	generator = require("./generator.js")
 ,	UA = require("./ua.js")
+,	counter = require("./counter.js")
 ,	ieOptimize = require("./optimize-ie.js")
 ,	chromeOptimize = require("./optimize-chrome.js")
 ,	logFd
 ,	resultFd
+,	testArray = loader.standardLoader("../../static/standard.json") //testArray中存放已规格化的JSON对象.
 
-//将json转换为map.
-Object.keys(uaList.L1).forEach((val, idx, array) => {
-	uaList.L1[val] = new RegExp(uaList.L1[val], "i")
-})
-Object.keys(uaList.L2).forEach((val, idx, array) => {
-	Object.keys(uaList.L2[val]).forEach((v, i, arr) => {
-		uaList.L2[val][v] = new RegExp(uaList.L2[val][v], "i")
-	})
-})
+testArray = generator.generate(testArray)
 
 let HitTable = function(){
 	let hitMap = {}
@@ -98,6 +93,7 @@ let Counter = function(){
 		counter: number,
 	}
 */
+
 let testCounter = 0
 let test = function(ua, useCache, useOptimization){
 	let counter = 0
@@ -128,8 +124,6 @@ let test = function(ua, useCache, useOptimization){
 		counter += cacheResult.counter
 		if(!!cacheResult.UA){
 			return success(cacheResult.UA)
-		}else{
-			console.log(testCounter++)
 		}
 	}
 
@@ -197,7 +191,7 @@ let execFromArray = function(srcArray, option, callback){
 		let uaArray = []
 		for(let ua of srcArray){
 			let result = test(ua.toString(), !!option.useCache, !!option.useOptimization)
-			uaArray.push(result)
+			uaArray.push(result.result)
 		}
 		callback(uaArray)
 	}

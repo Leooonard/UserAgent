@@ -2,35 +2,29 @@
 
 'use strict'
 
-let ut = require('util')
-,	fs = require("fs")
-,	clean = require('./clean.js')
-,	compare = require("./compare.js")
-,	show = require("./show.js")
-,	exec = require("./exec/exec.js")
-,	md = require("./md.js")
 
-const HELP_COMMAND = "help"
-const CLEAN_COMMAND = "clean"
-const COMPARE_COMMAND = "compare"
-const EXEC_COMMAND = "exec"
+let fs = require("fs")
+,	processArgs = require("./lib/input.js")
+,	processFile = require("./command/file.js")
+,	processOne = require("./command/one.js")
+,	processHelp = require("./command/help.js")
 
-let args = process.argv.slice(2)
-,	command = args.length === 0 ? '' : args.shift().toLowerCase()
+const COMMAND_MAP = {
+	file: processFile,
+	one: processOne,
+	help: processHelp,
+}
 
-if(command === HELP_COMMAND){
-	console.log('\
-command list:\n\
-	exec - analyze the ua log, return analyzed info. like ua exec [-cof] src [result]\n\
-		option c: use cache (default false)\n\
-		option o: use optimization for ie and chrome (default false)\n\
-		option f: src is a file (default string)\n\
-		result should the be a file path and end with .md or .html\n\
-	clean - filter the spiders in the ua log. like ua clean src target\n\
-	compare - compare two results. like ua compare src target [result]\n\
-		result should the be a file path and end with .md or .html\n\
-	help - print help')
-}else if(command === EXEC_COMMAND){
+let {command, params} = processArgs(process.argv)
+
+if(typeof COMMAND_MAP[command] !== "function"){
+	throw new Error("command not found. try 'uap help'")
+}else{
+	COMMAND_MAP[command](params)
+}
+
+/*
+if(command === EXEC_COMMAND){
 	const CACHE_FLAG = '-c'
 
 	let [option, srcFilePath, resultFilePath] = args
@@ -226,7 +220,5 @@ command list:\n\
 			"fit rate : " + fitRate
 		)
 	})
-
-}else{
-	console.error('err: unknown command, please enter "ua help" for more options.')
 }
+*/
