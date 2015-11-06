@@ -1,0 +1,6 @@
+{
+    "file": "./log/small.log",
+    "output": "./log/result.log",
+    "analysis": true,
+    "count": 10
+}

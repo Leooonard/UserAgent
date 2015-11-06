@@ -79,7 +79,6 @@ function IE(ua) {
         }
     }
 
-    console.log("optimize ie hit");
     return true;
 }
 
@@ -165,7 +164,6 @@ function Chrome(ua) {
         }
     }
 
-    console.log("optimize chrome hit");
     return true;
 }
 

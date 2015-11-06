@@ -13,9 +13,9 @@ let tester = {
             return  false
         }
         tester.result = {
-            major: result[1],
-            minor: result[2],
-            patch: result[3],
+            major: result[1] || "unknown",
+            minor: result[2] || "unknown",
+            patch: result[3] || "unknown",
         }
         return true
     },

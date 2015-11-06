@@ -1,0 +1,6 @@
+{
+    "file": "dist/log/small.log",
+    "output": "./",
+    "analysis": true,
+    "count": 10
+}
